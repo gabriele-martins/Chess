@@ -1,4 +1,4 @@
-﻿namespace Chess.Model.Pieces;
+﻿namespace Chess.Model.Game.Pieces;
 
 public class King : Piece
 {
@@ -14,7 +14,7 @@ public class King : Piece
     {
         if (Math.Abs(Row - destinatedRow) == 1 || Math.Abs(Row - destinatedRow) == 0)
         {
-            if(Math.Abs(Column - destinatedColumn) == 1 || Math.Abs(Column - destinatedColumn) == 0)
+            if (Math.Abs(Column - destinatedColumn) == 1 || Math.Abs(Column - destinatedColumn) == 0)
             {
                 if (Board.Table[destinatedRow, destinatedColumn] == null)
                 {

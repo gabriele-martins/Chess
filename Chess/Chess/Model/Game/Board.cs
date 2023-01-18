@@ -1,6 +1,6 @@
-﻿using Chess.Model.Pieces;
+﻿using Chess.Model.Game.Pieces;
 
-namespace Chess.Model;
+namespace Chess.Model.Game;
 
 public class Board
 {

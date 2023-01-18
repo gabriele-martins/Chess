@@ -2,7 +2,7 @@
 
 public class Print
 {
-    #region Opening and Closing
+    #region Opening and Closing Messages
     public static void StartChessGame()
     {
         Console.WriteLine("\n\tBem-vindo(a) ao Chess.");
@@ -38,7 +38,7 @@ public class Print
     {
         Console.Clear();
         Console.WriteLine("\n\tEscolha uma opção para continuar: ");
-        Console.WriteLine("\n\t1 - Manipular conta de Jogador");
+        Console.WriteLine("\n\t1 - Manipular Jogadores");
         Console.WriteLine("\t2 - Ranking de Jogadores");
         Console.WriteLine("\t3 - Jogar Xadrez");
         Console.WriteLine("\t0 - Sair do jogo");
@@ -50,9 +50,8 @@ public class Print
         Console.Clear();
         Console.WriteLine("\n\tEscolha uma opção para continuar: ");
         Console.WriteLine("\n\t1 - Cadastrar novo Jogador");
-        Console.WriteLine("\t2 - Atualizar um Jogador");
-        Console.WriteLine("\t3 - Detalhes de um Jogador");
-        Console.WriteLine("\t4 - Deletar Jogador");
+        Console.WriteLine("\t2 - Detalhes de um Jogador");
+        Console.WriteLine("\t3 - Deletar Jogador");
         Console.WriteLine("\t0 - Voltar para o Menu Principal");
         Console.Write("\n\tDigite a opção desejada: ");
     }
@@ -67,6 +66,24 @@ public class Print
         Console.WriteLine("\tB - Bispo;");
         Console.WriteLine("\tN - Cavalo;");
         Console.Write("\n\tDigite a letra da peça: ");
+    }
+    #endregion
+
+    #region Requests
+    public static string AskNickname()
+    {
+        Console.Clear();
+        Console.Write("\n\tDigite o nickname: ");
+        string nick = Console.ReadLine();
+        return nick;
+    }
+
+    public static string AskPass()
+    {
+        Console.Clear();
+        Console.Write("\n\tDigite a senha: ");
+        string pass = Console.ReadLine();
+        return pass;
     }
     #endregion
 
@@ -134,17 +151,40 @@ public class Print
         ShowTryAgainMessage();
     }
 
+    public static void ShowNicknameNotFoundMessage()
+    {
+        WriteRed("\n\tO nickname digitado não é válido ou não foi encontrado.");
+        ShowTryAgainMessage();
+    }
+
+    public static void ShowInvalidPassMessage()
+    {
+        WriteRed("\n\tSenha incorreta.");
+        ShowTryAgainMessage();
+    }
     #endregion
 
     #region Success Messages
     public static void ShowCheckMateMessage()
     {
         WriteGreen("\n\n\t ------- XEQUE MATE -------");
-        ShowContinueMessage();
+        ShowBackMessage();
+    }
+
+    public static void ShowPlayerAddedMessage()
+    {
+        WriteGreen("\n\tJogador adicionado com sucesso.");
+        ShowBackMessage();
+    }
+
+    public static void ShowPlayerDeletedMessage()
+    {
+        WriteGreen("\n\tJogador removido com sucesso.");
+        ShowBackMessage();
     }
     #endregion
 
-    #region Continue, Back and Try Again Messages
+    #region ReadKey Messages
     public static void ShowContinueMessage()
     {
         Console.Write("\n\tPressione qualquer tecla para continuar");

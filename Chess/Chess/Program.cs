@@ -1,4 +1,5 @@
 ﻿using Chess.Service.Game;
+using Chess.Service.Players;
 using Chess.View;
 
 namespace Chess;
@@ -25,8 +26,10 @@ public class Program
                     Print.ExitChessGame();
                     break;
                 case "1":
+                    PlayerService.ManipulatePlayerAccount();
                     break;
                 case "2":
+                    PlayerService.ShowPlayerRanking();
                     break;
                 case "3":
                     Match.Play();

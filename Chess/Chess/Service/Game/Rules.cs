@@ -1,11 +1,12 @@
-﻿using Chess.Model;
-using Chess.Model.Pieces;
+﻿using Chess.Model.Game;
+using Chess.Model.Game.Pieces;
 using Chess.View;
 
 namespace Chess.Service.Game;
 
 public class Rules
 {
+    #region Methods
     protected static bool CheckValidMove(ref Piece piece, int destinatedRow, int destinatedColumn, Board b)
     {
         if (piece.IsPossibleMovement(destinatedRow, destinatedColumn, b))
@@ -188,4 +189,5 @@ public class Rules
         if (countOfKings == 1) return true;
         else return false;
     }
+    #endregion
 }

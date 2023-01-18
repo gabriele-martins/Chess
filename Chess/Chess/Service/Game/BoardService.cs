@@ -1,4 +1,4 @@
-﻿using Chess.Model;
+﻿using Chess.Model.Game;
 
 namespace Chess.Service.Game;
 

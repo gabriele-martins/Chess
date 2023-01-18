@@ -1,11 +1,12 @@
-﻿using Chess.Model;
-using Chess.Model.Pieces;
+﻿using Chess.Model.Game;
+using Chess.Model.Game.Pieces;
 using Chess.View;
 
 namespace Chess.Service.Game;
 
 public class Match : Rules
 {
+    #region Methods
     public static void Play()
     {
         Board board = new Board();
@@ -177,4 +178,5 @@ public class Match : Rules
             }
         }
     }
+    #endregion
 }
