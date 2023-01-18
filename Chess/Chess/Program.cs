@@ -1,4 +1,5 @@
-﻿using Chess.View;
+﻿using Chess.Service.Game;
+using Chess.View;
 
 namespace Chess;
 
@@ -28,6 +29,7 @@ public class Program
                 case "2":
                     break;
                 case "3":
+                    Match.Play();
                     break;
                 default:
                     Print.ShowInvalidOption();
@@ -35,8 +37,5 @@ public class Program
             }
 
         } while(option != "0");
-
-        
-        
     }
 }

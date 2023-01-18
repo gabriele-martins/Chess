@@ -19,11 +19,11 @@ public class Pawn : Piece
                 {
                     if (destinatedRow == Row - 1)
                     {
-                        if (destinatedColumn == Column && b.Table[destinatedRow, destinatedColumn] == null)
+                        if (destinatedColumn == Column && Board.Table[destinatedRow, destinatedColumn] == null)
                         {
                             return true;
                         }
-                        else if ((destinatedColumn == Column - 1 || destinatedColumn == Column + 1) && b.Table[destinatedRow, destinatedColumn] != null)
+                        else if ((destinatedColumn == Column - 1 || destinatedColumn == Column + 1) && Board.Table[destinatedRow, destinatedColumn] != null)
                         {
                             return true;
                         }
@@ -39,11 +39,11 @@ public class Pawn : Piece
                 {
                     if (destinatedRow == Row - 1)
                     {
-                        if (destinatedColumn == Column && b.Table[destinatedRow, destinatedColumn] == null)
+                        if (destinatedColumn == Column && Board.Table[destinatedRow, destinatedColumn] == null)
                         {
                             return true;
                         }
-                        else if ((destinatedColumn == Column - 1 || destinatedColumn == Column + 1) && b.Table[destinatedRow, destinatedColumn] != null)
+                        else if ((destinatedColumn == Column - 1 || destinatedColumn == Column + 1) && Board.Table[destinatedRow, destinatedColumn] != null)
                         {
                             return true;
                         }
@@ -52,7 +52,7 @@ public class Pawn : Piece
                     }
                     else if (destinatedRow == Row - 2)
                     {
-                        if (destinatedColumn == Column && b.Table[destinatedRow, destinatedColumn] == null && b.Table[Row - 1, destinatedColumn] == null)
+                        if (destinatedColumn == Column && Board.Table[destinatedRow, destinatedColumn] == null && Board.Table[Row - 1, destinatedColumn] == null)
                             return true;
                         else
                             return false;
@@ -67,11 +67,11 @@ public class Pawn : Piece
                 {
                     if (destinatedRow == Row + 1)
                     {
-                        if (destinatedColumn == Column && b.Table[destinatedRow, destinatedColumn] == null)
+                        if (destinatedColumn == Column && Board.Table[destinatedRow, destinatedColumn] == null)
                         {
                             return true;
                         }
-                        else if ((destinatedColumn == Column - 1 || destinatedColumn == Column + 1) && b.Table[destinatedRow, destinatedColumn] != null)
+                        else if ((destinatedColumn == Column - 1 || destinatedColumn == Column + 1) && Board.Table[destinatedRow, destinatedColumn] != null)
                         {
                             return true;
                         }
@@ -87,11 +87,11 @@ public class Pawn : Piece
                 {
                     if (destinatedRow == Row + 1)
                     {
-                        if (destinatedColumn == Column && b.Table[destinatedRow, destinatedColumn] == null)
+                        if (destinatedColumn == Column && Board.Table[destinatedRow, destinatedColumn] == null)
                         {
                             return true;
                         }
-                        else if ((destinatedColumn == Column - 1 || destinatedColumn == Column + 1) && b.Table[destinatedRow, destinatedColumn] != null)
+                        else if ((destinatedColumn == Column - 1 || destinatedColumn == Column + 1) && Board.Table[destinatedRow, destinatedColumn] != null)
                         {
                             return true;
                         }
@@ -100,7 +100,7 @@ public class Pawn : Piece
                     }
                     else if (destinatedRow == Row + 2)
                     {
-                        if (destinatedColumn == Column && b.Table[destinatedRow, destinatedColumn] == null && b.Table[Row + 1, destinatedColumn] == null)
+                        if (destinatedColumn == Column && Board.Table[destinatedRow, destinatedColumn] == null && Board.Table[Row + 1, destinatedColumn] == null)
                             return true;
                         else
                             return false;

@@ -12,6 +12,11 @@ public class Rook : Piece
     #region Methods
     public override bool IsPossibleMovement(int destinatedRow, int destinatedColumn, Board b)
     {
+        if (destinatedRow == Row && destinatedColumn == Column)
+        {
+            return false;
+        }
+
         int piecesInTheWay = 0;
 
         if (destinatedColumn == Column)
@@ -20,7 +25,7 @@ public class Rook : Piece
             {
                 for (int i = Row - 1; i > destinatedRow; i--)
                 {
-                    if (b.Table[i, Column] != null) piecesInTheWay++;
+                    if (Board.Table[i, Column] != null) piecesInTheWay++;
                 }
                 if (piecesInTheWay == 0) return true;
                 else return false;
@@ -29,7 +34,7 @@ public class Rook : Piece
             {
                 for (int i = Row + 1; i < destinatedRow; i++)
                 {
-                    if (b.Table[i, Column] != null) piecesInTheWay++;
+                    if (Board.Table[i, Column] != null) piecesInTheWay++;
                 }
                 if (piecesInTheWay == 0) return true;
                 else return false;
@@ -43,7 +48,7 @@ public class Rook : Piece
             {
                 for (int j = Column - 1; j > destinatedColumn; j--)
                 {
-                    if (b.Table[Row, j] != null) piecesInTheWay++;
+                    if (Board.Table[Row, j] != null) piecesInTheWay++;
                 }
                 if (piecesInTheWay == 0) return true;
                 else return false;
@@ -52,7 +57,7 @@ public class Rook : Piece
             {
                 for (int j = Row + 1; j < destinatedColumn; j++)
                 {
-                    if (b.Table[Row, j] != null) piecesInTheWay++;
+                    if (Board.Table[Row, j] != null) piecesInTheWay++;
                 }
                 if (piecesInTheWay == 0) return true;
                 else return false;

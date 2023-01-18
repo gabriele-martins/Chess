@@ -12,10 +12,22 @@ public class King : Piece
     #region Methods
     public override bool IsPossibleMovement(int destinatedRow, int destinatedColumn, Board b)
     {
-        if (Math.Abs(Row - destinatedRow) != 1 || Math.Abs(Column - destinatedColumn) != 1 || Math.Abs(Row - destinatedRow) != 0 || Math.Abs(Column - destinatedColumn) != 0)
-            return false;
-        else
-            return true;
+        if (Math.Abs(Row - destinatedRow) == 1 || Math.Abs(Row - destinatedRow) == 0)
+        {
+            if(Math.Abs(Column - destinatedColumn) == 1 || Math.Abs(Column - destinatedColumn) == 0)
+            {
+                if (Board.Table[destinatedRow, destinatedColumn] == null)
+                {
+                    return true;
+                }
+                else if (Board.Table[destinatedRow, destinatedColumn].Color != Color)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
     #endregion
 }

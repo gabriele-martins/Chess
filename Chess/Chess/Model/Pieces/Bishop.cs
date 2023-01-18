@@ -12,6 +12,11 @@ public class Bishop : Piece
     #region Methods
     public override bool IsPossibleMovement(int destinatedRow, int destinatedColumn, Board b)
     {
+        if (destinatedRow == Row && destinatedColumn == Column)
+        {
+            return false;
+        }
+
         int piecesInTheWay = 0;
 
         if (Math.Abs(Row - destinatedRow) == Math.Abs(Column - destinatedColumn))
@@ -20,7 +25,7 @@ public class Bishop : Piece
             {
                 for (int i = Row - 1, j = Column - 1; i > destinatedRow; i--, j--)
                 {
-                    if (b.Table[i, j] != null) piecesInTheWay++;
+                    if (Board.Table[i, j] != null) piecesInTheWay++;
                 }
                 if (piecesInTheWay == 0)
                     return true;
@@ -31,7 +36,7 @@ public class Bishop : Piece
             {
                 for (int i = Row - 1, j = Column + 1; i > destinatedRow; i--, j++)
                 {
-                    if (b.Table[i, j] != null) piecesInTheWay++;
+                    if (Board.Table[i, j] != null) piecesInTheWay++;
                 }
                 if (piecesInTheWay == 0)
                     return true;
@@ -42,7 +47,7 @@ public class Bishop : Piece
             {
                 for (int i = Row + 1, j = Column - 1; i < destinatedRow; i++, j--)
                 {
-                    if (b.Table[i, j] != null) piecesInTheWay++;
+                    if (Board.Table[i, j] != null) piecesInTheWay++;
                 }
                 if (piecesInTheWay == 0)
                     return true;
@@ -53,7 +58,7 @@ public class Bishop : Piece
             {
                 for (int i = Row + 1, j = Column + 1; i < destinatedRow; i++, j++)
                 {
-                    if (b.Table[i, j] != null) piecesInTheWay++;
+                    if (Board.Table[i, j] != null) piecesInTheWay++;
                 }
                 if (piecesInTheWay == 0)
                     return true;
