@@ -46,6 +46,7 @@ public class Player
             }
         } 
     }
+    public string Color { get; set; }
     public int Matches { get; set; }
     public int Score { get; set; }
     public int Wins { get; set; }
@@ -56,6 +57,7 @@ public class Player
     #region Constructor
     public Player()
     {
+        Color = "";
         Matches = 0;
         Score = 0;
         Wins = 0;

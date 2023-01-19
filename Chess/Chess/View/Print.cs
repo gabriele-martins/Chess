@@ -1,4 +1,7 @@
-﻿namespace Chess.View;
+﻿using Chess.Model.Players;
+using System.Numerics;
+
+namespace Chess.View;
 
 public class Print
 {
@@ -85,6 +88,10 @@ public class Print
         string pass = Console.ReadLine();
         return pass;
     }
+    public static void AskTie()
+    {
+        Console.WriteLine("\n\tO outro jogador solicitou empate. Digite \"sim\" para aceitar ou \"não\" para continuar a partida.");
+    }
     #endregion
 
     #region Error Messages
@@ -147,7 +154,7 @@ public class Print
     public static void ShowKingInCheckMessage()
     {
         Console.Clear();
-        WriteRed("\n\tSeu rei está em xeque.Proteja-o.");
+        WriteRed("\n\tSeu rei ainda está em xeque.Proteja-o.");
         ShowTryAgainMessage();
     }
 
@@ -165,9 +172,23 @@ public class Print
     #endregion
 
     #region Success Messages
-    public static void ShowCheckMateMessage()
+    public static void ShowSurrenderMessage(Player player)
+    {
+        WriteGreen("\n\n\t -------- RENDIÇÃO --------");
+        WriteGreen($"\n\tVencedor: {player.Nickname}");
+        ShowBackMessage();
+    }
+
+    public static void ShowTieMessage()
+    {
+        WriteGreen("\n\n\t --------- EMPATE ---------");
+        ShowBackMessage();
+    }
+
+    public static void ShowCheckMateMessage(Player player)
     {
         WriteGreen("\n\n\t ------- XEQUE MATE -------");
+        WriteGreen($"\n\tVencedor: {player.Nickname}");
         ShowBackMessage();
     }
 

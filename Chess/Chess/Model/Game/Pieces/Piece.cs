@@ -1,6 +1,6 @@
 ﻿namespace Chess.Model.Game.Pieces;
 
-public class Piece
+public abstract class Piece
 {
     #region Properties
     public int Row { get; set; }
@@ -22,10 +22,7 @@ public class Piece
     #endregion
 
     #region Methods
-    public virtual bool IsPossibleMovement(int destinatedRow, int destinatedColumn, Board b)
-    {
-        return false;
-    }
+    public abstract bool IsPossibleMovement(int destinatedRow, int destinatedColumn, Board b);
 
     public override string ToString()
     {

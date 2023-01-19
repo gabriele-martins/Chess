@@ -7,7 +7,7 @@ namespace Chess.Controller.Players;
 public class PlayerController
 {
     #region Attributes
-    protected static List<Player> players = Json.Desserializar();
+    public static List<Player> players = Json.Desserializar();
     #endregion
 
     #region Methods

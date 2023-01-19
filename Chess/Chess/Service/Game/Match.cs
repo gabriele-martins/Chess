@@ -1,5 +1,8 @@
-﻿using Chess.Model.Game;
+﻿using Chess.Controller.Players;
+using Chess.Model.Game;
 using Chess.Model.Game.Pieces;
+using Chess.Model.Players;
+using Chess.Service.Players;
 using Chess.View;
 
 namespace Chess.Service.Game;
@@ -9,6 +12,12 @@ public class Match : Rules
     #region Methods
     public static void Play()
     {
+        Player playerWhite = GetPlayer("Brancas");
+        playerWhite.Color = "White";
+        Player playerBlack = GetPlayer("Pretas");
+        playerBlack.Color = "Black";
+        Player wildPlayer, winnerPlayer = new Player();
+
         Board board = new Board();
 
         Piece piece, ghostPiece;
@@ -19,20 +28,63 @@ public class Match : Rules
 
         int round = 0;
 
-        bool checkMate = false;
+        string move = "";
 
         do
         {
-            if (IsInCheckOrCheckMate(turn, board) == "Check Mate")
+            if (turn % 2 == 0)
+                wildPlayer = playerWhite;
+            else
+                wildPlayer = playerBlack;
+
+            if (move == "empate")
             {
+                GetMove(wildPlayer, ref currentRow, ref currentColumn, ref move);
+                if(move == "sim")
+                {
+                    BoardService.ShowChessboard();
+                    Print.ShowTieMessage();
+                    break;
+                }
+                else
+                {
+                    turn++;
+                    continue;
+                }
+            }
+
+            if (IsInCheckOrCheckMate(wildPlayer, board) == "Check Mate")
+            {
+                if (wildPlayer.Color == "White")
+                    winnerPlayer = playerBlack;
+                else
+                    winnerPlayer = playerWhite;
+
                 BoardService.ShowChessboard();
-                Print.ShowCheckMateMessage();
-                checkMate = true;
+                Print.ShowCheckMateMessage(winnerPlayer);
                 break;
             }
 
-            GetCurrentPosition(board, turn, ref currentRow, ref currentColumn);
-            GetDestinatedPosition(board, turn, ref destinatedRow, ref destinatedColumn);
+            GetMove(wildPlayer, ref currentRow, ref currentColumn, ref move);
+
+            if (move == "empate")
+            {
+                turn++;
+                continue;
+            }
+            else if (move == "render")
+            {
+                if (wildPlayer.Color == "White")
+                    winnerPlayer = playerBlack;
+                else
+                    winnerPlayer = playerWhite;
+
+                BoardService.ShowChessboard();
+                Print.ShowSurrenderMessage(winnerPlayer);
+                break;
+            }
+
+            GetDestinatedPosition(wildPlayer, ref destinatedRow, ref destinatedColumn);
 
             piece = Board.Table[currentRow, currentColumn];
             ghostPiece = Board.Table[destinatedRow, destinatedColumn];
@@ -50,6 +102,7 @@ public class Match : Rules
             {
                 piece.Row = destinatedRow;
                 piece.Column = destinatedColumn;
+                piece.Moves++;
                 Board.Table[currentRow, currentColumn] = null;
                 Board.Table[destinatedRow, destinatedColumn] = piece;
                 turn++;
@@ -60,7 +113,7 @@ public class Match : Rules
                 continue;
             }
 
-            if (IsInCheckOrCheckMate(turn-1, board) == "Check")
+            if (IsInCheckOrCheckMate(wildPlayer, board) == "Check")
             {
                 Print.ShowKingInCheckMessage();
                 piece.Row = currentRow;
@@ -71,79 +124,105 @@ public class Match : Rules
                 continue;
             }
 
-        } while(!(CheckEndGame(board) || checkMate));
+        } while (true);
+
+        UpdateScore(move, playerWhite, playerBlack, wildPlayer, winnerPlayer);
+    }
+    private static Player GetPlayer(string cor)
+    {
+        string playerNick;
+        while (true)
+        {
+            Console.Clear();
+            Console.WriteLine("\n\tDigite o nickname dos jogadores.");
+            Console.Write($"\n\tJogador (Peças {cor}): ");
+            playerNick = Console.ReadLine();
+            if (PlayerController.ValidateNickname(playerNick))
+            {
+                return PlayerController.players.Find(player => player.Nickname == playerNick);
+            }
+            else
+            {
+                Print.ShowNicknameNotFoundMessage();
+            }
+        }
     }
 
-    private static void GetCurrentPosition(Board b, int turn, ref int currentRow, ref int currentColumn)
+    private static void GetMove(Player player, ref int currentRow, ref int currentColumn, ref string move)
     {
-        string currentPosition;
-        string color;
         string jogador;
 
-        if (turn % 2 == 0)
-        {
-            color = "White";
-            jogador = "Jogador 1 (Peças Brancas)";
-        }
+        if (player.Color == "White")
+            jogador = $"{player.Nickname} (Peças Brancas)";
         else
-        {
-            color = "Black";
-            jogador = "Jogador 2 (Peças Pretas)";
-        }
+            jogador = $"{player.Nickname} (Peças Pretas)";
 
         while (true)
         {
             BoardService.ShowChessboard();
 
-            Console.WriteLine($"\n\n\tVez do {jogador}.");
+            Console.WriteLine($"\n\n\tVez de {jogador}.");
 
-            Console.Write("\n\tDigite, respectivamente, a linha e coluna atuais da peça que deseja mover: ");
+            if (move == "empate")
+            {
+                Print.AskTie();
+            }
 
-            currentPosition = Console.ReadLine().ToLower();
+            Console.Write("\n\tDigite sua jogada: ");
 
-            if (string.IsNullOrEmpty(currentPosition))
+            move = Console.ReadLine().ToLower();
+
+            if (string.IsNullOrEmpty(move))
             {
                 Print.ShowNullValue();
                 continue;
             }
-            else if (currentPosition.Length != 2 || !char.IsLetter(currentPosition[0]) || !char.IsDigit(currentPosition[1]))
+            else if (move == "empate" || move == "render")
+            {
+                break;
+            }
+            else if (move == "sim" || move == "não")
+            {
+                break;
+            }
+            else if (move.Length != 2 || !char.IsLetter(move[0]) || !char.IsDigit(move[1]))
             {
                 Print.ShowInvalidValue();
                 continue;
             }
-            else if (!Board.Rows.Contains(Convert.ToString(currentPosition[1])) || !Board.Columns.Contains(Convert.ToString(currentPosition[0])))
+            else if (!Board.Rows.Contains(Convert.ToString(move[1])) || !Board.Columns.Contains(Convert.ToString(move[0])))
             {
                 Print.ShowNonExistentPosition();
                 continue;
             }
-            else if (Board.Table[Array.IndexOf(Board.Rows, Convert.ToString(currentPosition[1])), Array.IndexOf(Board.Columns, Convert.ToString(currentPosition[0]))] == null)
+            else if (Board.Table[Array.IndexOf(Board.Rows, Convert.ToString(move[1])), Array.IndexOf(Board.Columns, Convert.ToString(move[0]))] == null)
             {
                 Print.ShowNoPieceHere();
                 continue;
             }
-            else if (Board.Table[Array.IndexOf(Board.Rows, Convert.ToString(currentPosition[1])), Array.IndexOf(Board.Columns, Convert.ToString(currentPosition[0]))].Color != color)
+            else if (Board.Table[Array.IndexOf(Board.Rows, Convert.ToString(move[1])), Array.IndexOf(Board.Columns, Convert.ToString(move[0]))].Color != player.Color)
             {
                 Print.ShowOpponetsPiece();
                 continue;
             }
             else
             {
-                currentRow = Array.IndexOf(Board.Rows, Convert.ToString(currentPosition[1]));
-                currentColumn = Array.IndexOf(Board.Columns, Convert.ToString(currentPosition[0]));
+                currentRow = Array.IndexOf(Board.Rows, Convert.ToString(move[1]));
+                currentColumn = Array.IndexOf(Board.Columns, Convert.ToString(move[0]));
                 break;
             }
         }
     }
 
-    private static void GetDestinatedPosition(Board b, int turn, ref int destinatedRow, ref int destinatedColumn)
+    private static void GetDestinatedPosition(Player player, ref int destinatedRow, ref int destinatedColumn)
     {
         string destinatedPosition;
         string jogador;
 
-        if (turn % 2 == 0)
-            jogador = "Jogador 1 (Peças Brancas)";
+        if (player.Color == "White")
+            jogador = $"{player.Nickname} (Peças Brancas)";
         else
-            jogador = "Jogador 2 (Peças Pretas)";
+            jogador = $"{player.Nickname} (Peças Pretas)";
 
         while (true)
         {
@@ -151,7 +230,7 @@ public class Match : Rules
 
             Console.WriteLine($"\n\n\tVez do {jogador}.");
 
-            Console.Write("\n\tDigite, respectivamente, a linha e coluna para onde deseja mover a peça: ");
+            Console.Write("\n\tDigite o destino: ");
 
             destinatedPosition = Console.ReadLine().ToLower();
 
@@ -177,6 +256,39 @@ public class Match : Rules
                 break;
             }
         }
+    }
+
+    private static void UpdateScore(string move, Player playerWhite, Player playerBlack, Player wildPlayer, Player winnerPlayer)
+    {
+        if(move == "sim")
+        {
+            playerWhite.Matches++;
+            playerWhite.Ties++;
+            playerWhite.Score++;
+
+            playerBlack.Matches++;
+            playerBlack.Ties++;
+            playerBlack.Score++;
+        }
+        else if (move == "render")
+        {
+            winnerPlayer.Matches++;
+            winnerPlayer.Wins++;
+            winnerPlayer.Score += 3;
+
+            wildPlayer.Matches++;
+            wildPlayer.Defeats++;
+        }
+        else
+        {
+            winnerPlayer.Matches++;
+            winnerPlayer.Wins++;
+            winnerPlayer.Score += 3;
+
+            wildPlayer.Matches++;
+            wildPlayer.Defeats++;
+        }
+        PlayerService.UpdatePlayers();
     }
     #endregion
 }
