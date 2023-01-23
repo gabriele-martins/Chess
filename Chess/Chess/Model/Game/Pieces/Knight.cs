@@ -1,11 +1,14 @@
-﻿namespace Chess.Model.Game.Pieces;
+﻿using Chess.Model.Enum;
+
+namespace Chess.Model.Game.Pieces;
 
 public class Knight : Piece
 {
     #region Constructor
-    public Knight(int row, int column, string color) : base(row, column, color)
+    public Knight(int row, int column, Color color) : base(row, column)
     {
-        Symbol = "N";
+        Color = color;
+        Symbol = Symbol.N;
     }
     #endregion
 

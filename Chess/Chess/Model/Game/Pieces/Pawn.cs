@@ -1,11 +1,14 @@
-﻿namespace Chess.Model.Game.Pieces;
+﻿using Chess.Model.Enum;
+
+namespace Chess.Model.Game.Pieces;
 
 public class Pawn : Piece
 {
     #region Constructor
-    public Pawn(int row, int column, string color) : base(row, column, color)
+    public Pawn(int row, int column, Color color) : base(row, column)
     {
-        Symbol = "P";
+        Color = color;
+        Symbol = Symbol.P;
     }
     #endregion
 
@@ -14,16 +17,16 @@ public class Pawn : Piece
     {
         switch (Color)
         {
-            case "White":
+            case Color.White:
                 if (Moves != 0)
                 {
                     if (destinatedRow == Row - 1)
                     {
-                        if (destinatedColumn == Column && Board.Table[destinatedRow, destinatedColumn] == null)
+                        if (destinatedColumn == Column && Board.BoardTable[destinatedRow, destinatedColumn].Symbol == Symbol.Empty)
                         {
                             return true;
                         }
-                        else if ((destinatedColumn == Column - 1 || destinatedColumn == Column + 1) && Board.Table[destinatedRow, destinatedColumn] != null)
+                        else if ((destinatedColumn == Column - 1 || destinatedColumn == Column + 1) && Board.BoardTable[destinatedRow, destinatedColumn].Color == Color.Black)
                         {
                             return true;
                         }
@@ -39,11 +42,11 @@ public class Pawn : Piece
                 {
                     if (destinatedRow == Row - 1)
                     {
-                        if (destinatedColumn == Column && Board.Table[destinatedRow, destinatedColumn] == null)
+                        if (destinatedColumn == Column && Board.BoardTable[destinatedRow, destinatedColumn].Symbol == Symbol.Empty)
                         {
                             return true;
                         }
-                        else if ((destinatedColumn == Column - 1 || destinatedColumn == Column + 1) && Board.Table[destinatedRow, destinatedColumn] != null)
+                        else if ((destinatedColumn == Column - 1 || destinatedColumn == Column + 1) && Board.BoardTable[destinatedRow, destinatedColumn].Color == Color.Black)
                         {
                             return true;
                         }
@@ -52,7 +55,7 @@ public class Pawn : Piece
                     }
                     else if (destinatedRow == Row - 2)
                     {
-                        if (destinatedColumn == Column && Board.Table[destinatedRow, destinatedColumn] == null && Board.Table[Row - 1, destinatedColumn] == null)
+                        if (destinatedColumn == Column && Board.BoardTable[destinatedRow, destinatedColumn].Symbol == Symbol.Empty && Board.BoardTable[Row - 1, destinatedColumn].Symbol == Symbol.Empty)
                             return true;
                         else
                             return false;
@@ -62,16 +65,16 @@ public class Pawn : Piece
                         return false;
                     }
                 }
-            case "Black":
+            case Color.Black:
                 if (Moves != 0)
                 {
                     if (destinatedRow == Row + 1)
                     {
-                        if (destinatedColumn == Column && Board.Table[destinatedRow, destinatedColumn] == null)
+                        if (destinatedColumn == Column && Board.BoardTable[destinatedRow, destinatedColumn].Symbol == Symbol.Empty)
                         {
                             return true;
                         }
-                        else if ((destinatedColumn == Column - 1 || destinatedColumn == Column + 1) && Board.Table[destinatedRow, destinatedColumn] != null)
+                        else if ((destinatedColumn == Column - 1 || destinatedColumn == Column + 1) && Board.BoardTable[destinatedRow, destinatedColumn].Color == Color.White)
                         {
                             return true;
                         }
@@ -87,11 +90,11 @@ public class Pawn : Piece
                 {
                     if (destinatedRow == Row + 1)
                     {
-                        if (destinatedColumn == Column && Board.Table[destinatedRow, destinatedColumn] == null)
+                        if (destinatedColumn == Column && Board.BoardTable[destinatedRow, destinatedColumn].Symbol == Symbol.Empty)
                         {
                             return true;
                         }
-                        else if ((destinatedColumn == Column - 1 || destinatedColumn == Column + 1) && Board.Table[destinatedRow, destinatedColumn] != null)
+                        else if ((destinatedColumn == Column - 1 || destinatedColumn == Column + 1) && Board.BoardTable[destinatedRow, destinatedColumn].Color == Color.White)
                         {
                             return true;
                         }
@@ -100,7 +103,7 @@ public class Pawn : Piece
                     }
                     else if (destinatedRow == Row + 2)
                     {
-                        if (destinatedColumn == Column && Board.Table[destinatedRow, destinatedColumn] == null && Board.Table[Row + 1, destinatedColumn] == null)
+                        if (destinatedColumn == Column && Board.BoardTable[destinatedRow, destinatedColumn].Symbol == Symbol.Empty && Board.BoardTable[Row + 1, destinatedColumn].Symbol == Symbol.Empty)
                             return true;
                         else
                             return false;

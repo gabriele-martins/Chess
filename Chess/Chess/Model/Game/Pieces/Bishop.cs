@@ -1,11 +1,14 @@
-﻿namespace Chess.Model.Game.Pieces;
+﻿using Chess.Model.Enum;
+
+namespace Chess.Model.Game.Pieces;
 
 public class Bishop : Piece
 {
     #region Constructor
-    public Bishop(int row, int column, string color) : base(row, column, color)
+    public Bishop(int row, int column, Color color) : base(row, column)
     {
-        Symbol = "B";
+        Color = color;
+        Symbol = Symbol.B;
     }
     #endregion
 
@@ -25,7 +28,7 @@ public class Bishop : Piece
             {
                 for (int i = Row - 1, j = Column - 1; i > destinatedRow; i--, j--)
                 {
-                    if (Board.Table[i, j] != null) piecesInTheWay++;
+                    if (Board.BoardTable[i, j].Symbol != Symbol.Empty) piecesInTheWay++;
                 }
                 if (piecesInTheWay == 0)
                     return true;
@@ -36,7 +39,7 @@ public class Bishop : Piece
             {
                 for (int i = Row - 1, j = Column + 1; i > destinatedRow; i--, j++)
                 {
-                    if (Board.Table[i, j] != null) piecesInTheWay++;
+                    if (Board.BoardTable[i, j].Symbol != Symbol.Empty) piecesInTheWay++;
                 }
                 if (piecesInTheWay == 0)
                     return true;
@@ -47,7 +50,7 @@ public class Bishop : Piece
             {
                 for (int i = Row + 1, j = Column - 1; i < destinatedRow; i++, j--)
                 {
-                    if (Board.Table[i, j] != null) piecesInTheWay++;
+                    if (Board.BoardTable[i, j].Symbol != Symbol.Empty) piecesInTheWay++;
                 }
                 if (piecesInTheWay == 0)
                     return true;
@@ -58,7 +61,7 @@ public class Bishop : Piece
             {
                 for (int i = Row + 1, j = Column + 1; i < destinatedRow; i++, j++)
                 {
-                    if (Board.Table[i, j] != null) piecesInTheWay++;
+                    if (Board.BoardTable[i, j].Symbol != Symbol.Empty) piecesInTheWay++;
                 }
                 if (piecesInTheWay == 0)
                     return true;

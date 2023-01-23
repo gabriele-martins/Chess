@@ -1,5 +1,4 @@
 ﻿using Chess.Model.Players;
-using System.Numerics;
 
 namespace Chess.View;
 
@@ -154,7 +153,7 @@ public class Print
     public static void ShowKingInCheckMessage()
     {
         Console.Clear();
-        WriteRed("\n\tSeu rei ainda está em xeque.Proteja-o.");
+        WriteRed("\n\tSeu rei está em xeque. Proteja-o.");
         ShowTryAgainMessage();
     }
 
@@ -168,6 +167,20 @@ public class Print
     {
         WriteRed("\n\tSenha incorreta.");
         ShowTryAgainMessage();
+    }
+
+    public static void ShowNoRegisteredPlayersMessage()
+    {
+        Console.Clear();
+        WriteRed("\n\tNão há jogadores cadastrados no momento.");
+        ShowBackMessage();
+    }
+
+    public static void ShowCantPlayWithYourselfMessage()
+    {
+        Console.Clear();
+        WriteRed("\n\tVocê não pode jogar contra você mesmo.");
+        ShowBackMessage();
     }
     #endregion
 

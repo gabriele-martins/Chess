@@ -1,5 +1,6 @@
 ﻿using Chess.Model.Players;
 using Chess.Repository;
+using Chess.Service.Players;
 using Chess.View;
 
 namespace Chess.Controller.Players;
@@ -28,35 +29,51 @@ public class PlayerController
         else return true;
     }
 
+    public static string GetNickname()
+    {
+        string nick;
+        while (true)
+        {
+            try
+            {
+                nick = Print.AskNickname();
+                break;
+            }
+            catch (Exception e)
+            {
+                Print.WriteRed($"\n\t{e.Message}");
+                Print.ShowTryAgainMessage();
+            }
+        }
+        return nick;
+    }
+
+    public static string GetPass()
+    {
+        string pass;
+        while (true)
+        {
+            try
+            {
+                pass = Print.AskPass();
+                break;
+            }
+            catch (Exception e)
+            {
+                Print.WriteRed($"\n\t{e.Message}");
+                Print.ShowTryAgainMessage();
+            }
+        }
+        return pass;
+    }
+
     public static void AddPlayer()
     {
         Player newPlayer = new Player();
-        while (true)
-        {
-            try
-            {
-                newPlayer.Nickname = Print.AskNickname();
-                break;
-            }
-            catch (Exception e)
-            {
-                Print.WriteRed($"\n\t{e.Message}");
-                Print.ShowTryAgainMessage();
-            }
-        }
-        while (true)
-        {
-            try
-            {
-                newPlayer.Pass = Print.AskPass();
-                break;
-            }
-            catch (Exception e)
-            {
-                Print.WriteRed($"\n\t{e.Message}");
-                Print.ShowTryAgainMessage();
-            }
-        }
+
+        newPlayer.Nickname = GetNickname();
+        newPlayer.Pass = GetPass();
+
         players.Add(newPlayer);
         Json.Serializar(players);
         Print.ShowPlayerAddedMessage();
@@ -64,25 +81,9 @@ public class PlayerController
 
     public static void DeletePlayer()
     {
-        string nick, pass;
-        while (true)
-        {
-            nick = Print.AskNickname();
-            if (!ValidateNickname(nick))
-            {
-                Print.ShowNicknameNotFoundMessage();
-            }
-            else break;
-        }
-        while (true)
-        {
-            pass = Print.AskPass();
-            if (!ValidatePass(nick, pass))
-            {
-                Print.ShowInvalidPassMessage();
-            }
-            else break;
-        }
+        string nick = PlayerService.FindNickName();
+        string pass = PlayerService.CheckPass(nick);
+
         players.RemoveAll(cliente => cliente.Nickname == nick);
         Json.Serializar(players);
         Print.ShowPlayerDeletedMessage();

@@ -7,7 +7,7 @@ namespace Chess.Repository;
 public class Json
 {
     #region Attributes
-    private static string path = "Dados.json";
+    private static string path = @"C:..\..\..\Repository\PlayersData\Players.json";
     #endregion
 
     #region Methods

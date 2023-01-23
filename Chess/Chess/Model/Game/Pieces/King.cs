@@ -1,11 +1,14 @@
-﻿namespace Chess.Model.Game.Pieces;
+﻿using Chess.Model.Enum;
+
+namespace Chess.Model.Game.Pieces;
 
 public class King : Piece
 {
     #region Constructor
-    public King(int row, int column, string color) : base(row, column, color)
+    public King(int row, int column, Color color) : base(row, column)
     {
-        Symbol = "K";
+        Color = color;
+        Symbol = Symbol.K;
     }
     #endregion
 
@@ -16,11 +19,11 @@ public class King : Piece
         {
             if (Math.Abs(Column - destinatedColumn) == 1 || Math.Abs(Column - destinatedColumn) == 0)
             {
-                if (Board.Table[destinatedRow, destinatedColumn] == null)
+                if (Board.BoardTable[destinatedRow, destinatedColumn].Symbol == Symbol.Empty)
                 {
                     return true;
                 }
-                else if (Board.Table[destinatedRow, destinatedColumn].Color != Color)
+                else if (Board.BoardTable[destinatedRow, destinatedColumn].Color != Color)
                 {
                     return true;
                 }

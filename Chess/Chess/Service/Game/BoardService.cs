@@ -1,4 +1,5 @@
-﻿using Chess.Model.Game;
+﻿using Chess.Model.Enum;
+using Chess.Model.Game;
 
 namespace Chess.Service.Game;
 
@@ -24,23 +25,27 @@ public class BoardService : Board
                     if (j % 2 == 0)
                     {
                         Console.BackgroundColor = ConsoleColor.Blue;
-                        if (Table[i, j] == null) Console.Write(" ");
-                        else if (Table[i, j].Color == "White")
+                        if (BoardTable[i, j].Color == Color.White)
                             Console.ForegroundColor = ConsoleColor.White;
                         else
                             Console.ForegroundColor = ConsoleColor.Black;
-                        Console.Write($" {Table[i, j]} ");
+                        if (BoardTable[i, j].Symbol == Symbol.Empty)
+                            Console.Write("   ");
+                        else
+                            Console.Write($" {BoardTable[i, j]} ");
                         Console.ResetColor();
                     }
                     else
                     {
                         Console.BackgroundColor = ConsoleColor.DarkBlue;
-                        if (Table[i, j] == null) Console.Write(" ");
-                        else if (Table[i, j].Color == "White")
+                        if (BoardTable[i, j].Color == Color.White)
                             Console.ForegroundColor = ConsoleColor.White;
                         else
                             Console.ForegroundColor = ConsoleColor.Black;
-                        Console.Write($" {Table[i, j]} ");
+                        if (BoardTable[i, j].Symbol == Symbol.Empty)
+                            Console.Write("   ");
+                        else
+                            Console.Write($" {BoardTable[i, j]} ");
                         Console.ResetColor();
                     }
 
@@ -50,23 +55,27 @@ public class BoardService : Board
                     if (j % 2 == 0)
                     {
                         Console.BackgroundColor = ConsoleColor.DarkBlue;
-                        if (Table[i, j] == null) Console.Write(" ");
-                        else if (Table[i, j].Color == "White")
+                        if (BoardTable[i, j].Color == Color.White)
                             Console.ForegroundColor = ConsoleColor.White;
                         else
                             Console.ForegroundColor = ConsoleColor.Black;
-                        Console.Write($" {Table[i, j]} ");
+                        if (BoardTable[i, j].Symbol == Symbol.Empty)
+                            Console.Write("   ");
+                        else
+                            Console.Write($" {BoardTable[i, j]} ");
                         Console.ResetColor();
                     }
                     else
                     {
                         Console.BackgroundColor = ConsoleColor.Blue;
-                        if (Table[i, j] == null) Console.Write(" ");
-                        else if (Table[i, j].Color == "White")
+                        if (BoardTable[i, j].Color == Color.White)
                             Console.ForegroundColor = ConsoleColor.White;
                         else
                             Console.ForegroundColor = ConsoleColor.Black;
-                        Console.Write($" {Table[i, j]} ");
+                        if (BoardTable[i, j].Symbol == Symbol.Empty)
+                            Console.Write("   ");
+                        else
+                            Console.Write($" {BoardTable[i, j]} ");
                         Console.ResetColor();
                     }
                 }

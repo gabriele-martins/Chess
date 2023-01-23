@@ -1,32 +1,37 @@
-﻿namespace Chess.Model.Game.Pieces;
+﻿using Chess.Model.Enum;
 
-public abstract class Piece
+namespace Chess.Model.Game.Pieces;
+
+public class Piece
 {
     #region Properties
     public int Row { get; set; }
     public int Column { get; set; }
     public int Moves { get; set; }
-    public string Color { get; set; }
-    public string Symbol { get; set; }
+    public Color Color { get; set; }
+    public Symbol Symbol { get; set; }
     #endregion
 
     #region Constructors
-    public Piece(int row, int column, string color)
+    public Piece(int row, int column)
     {
         Row = row;
         Column = column;
-        Color = color;
-        Symbol = " ";
+        Color = Color.Colorless;
+        Symbol = Symbol.Empty;
         Moves = 0;
     }
     #endregion
 
     #region Methods
-    public abstract bool IsPossibleMovement(int destinatedRow, int destinatedColumn, Board b);
+    public virtual bool IsPossibleMovement(int destinatedRow, int destinatedColumn, Board b)
+    {
+        return false;
+    }
 
     public override string ToString()
     {
-        return Symbol;
+        return Symbol.ToString();
     }
     #endregion
 }

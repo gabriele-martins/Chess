@@ -1,11 +1,14 @@
-﻿namespace Chess.Model.Game.Pieces;
+﻿using Chess.Model.Enum;
+
+namespace Chess.Model.Game.Pieces;
 
 public class Rook : Piece
 {
     #region Constructor
-    public Rook(int row, int column, string color) : base(row, column, color)
+    public Rook(int row, int column, Color color) : base(row, column)
     {
-        Symbol = "R";
+        Color = color;
+        Symbol = Symbol.R;
     }
     #endregion
 
@@ -25,7 +28,7 @@ public class Rook : Piece
             {
                 for (int i = Row - 1; i > destinatedRow; i--)
                 {
-                    if (Board.Table[i, Column] != null) piecesInTheWay++;
+                    if (Board.BoardTable[i, Column].Symbol != Symbol.Empty) piecesInTheWay++;
                 }
                 if (piecesInTheWay == 0) return true;
                 else return false;
@@ -34,7 +37,7 @@ public class Rook : Piece
             {
                 for (int i = Row + 1; i < destinatedRow; i++)
                 {
-                    if (Board.Table[i, Column] != null) piecesInTheWay++;
+                    if (Board.BoardTable[i, Column].Symbol != Symbol.Empty) piecesInTheWay++;
                 }
                 if (piecesInTheWay == 0) return true;
                 else return false;
@@ -48,7 +51,7 @@ public class Rook : Piece
             {
                 for (int j = Column - 1; j > destinatedColumn; j--)
                 {
-                    if (Board.Table[Row, j] != null) piecesInTheWay++;
+                    if (Board.BoardTable[Row, j].Symbol != Symbol.Empty) piecesInTheWay++;
                 }
                 if (piecesInTheWay == 0) return true;
                 else return false;
@@ -57,7 +60,7 @@ public class Rook : Piece
             {
                 for (int j = Row + 1; j < destinatedColumn; j++)
                 {
-                    if (Board.Table[Row, j] != null) piecesInTheWay++;
+                    if (Board.BoardTable[Row, j].Symbol != Symbol.Empty) piecesInTheWay++;
                 }
                 if (piecesInTheWay == 0) return true;
                 else return false;

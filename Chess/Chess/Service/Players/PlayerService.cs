@@ -4,32 +4,46 @@ using Chess.View;
 
 namespace Chess.Service.Players;
 
-public class PlayerService : PlayerController
+public class PlayerService
 {
     #region Methods
-    public static void DetailPlayer()
+    public static string FindNickName()
     {
-        string nick, pass;
+        string nick;
         while (true)
         {
             nick = Print.AskNickname();
-            if (!ValidateNickname(nick))
+            if (!PlayerController.ValidateNickname(nick))
             {
                 Print.ShowNicknameNotFoundMessage();
             }
             else break;
         }
+        return nick;
+    }
+
+    public static string CheckPass(string nick)
+    {
+        string pass;
         while (true)
         {
             pass = Print.AskPass();
-            if (!ValidatePass(nick, pass))
+            if (!PlayerController.ValidatePass(nick, pass))
             {
                 Print.ShowInvalidPassMessage();
             }
             else break;
         }
+        return pass;
+    }
+
+    public static void DetailPlayer()
+    {
+        string nick = FindNickName(); 
+        string pass = CheckPass(nick);
+        
         Console.Clear();
-        Console.WriteLine(players.Find(c => c.Nickname == nick).ToString());
+        Console.WriteLine(PlayerController.players.Find(c => c.Nickname == nick).ToString());
         Print.ShowBackMessage();
     }
 
@@ -48,13 +62,13 @@ public class PlayerService : PlayerController
                 case "0":
                     break;
                 case "1":
-                    AddPlayer();
+                    PlayerController.AddPlayer();
                     break;
                 case "2":
                     DetailPlayer();
                     break;
                 case "3":
-                    DeletePlayer();
+                    PlayerController.DeletePlayer();
                     break;
                 default:
                     Print.ShowInvalidOption();
@@ -64,18 +78,26 @@ public class PlayerService : PlayerController
         } while (option != "0");
     }
 
-    public static void ShowPlayerRanking()
+    public static void ShowPlayersRanking()
     {
-        List<Player> ranking = players.OrderBy(player => player.Score).ThenBy(player => player.Wins).ThenByDescending(player => player.Defeats).ToList();
-
-        Console.Clear();
-        Console.WriteLine("\n\tRanking de Jogadores");
-        for (int i = ranking.Count - 1, j = 1; i >= 0; i--, j++)
+        try
         {
-            Console.WriteLine($"\n\t{j}º {ranking[i].Nickname}");
-            Console.WriteLine($"\tPontos: {ranking[i].Score}");
+            List<Player> ranking = PlayerController.players.OrderBy(player => player.Score).ThenBy(player => player.Wins).ThenByDescending(player => player.Defeats).ToList();
+
+            Console.Clear();
+            Console.WriteLine("\n\tRanking de Jogadores");
+            for (int i = ranking.Count - 1, j = 1; i >= 0; i--, j++)
+            {
+                Console.WriteLine($"\n\t{j}º {ranking[i].Nickname}");
+                Console.WriteLine($"\tPontos: {ranking[i].Score}");
+            }
+            Print.ShowBackMessage();
         }
-        Print.ShowBackMessage();
+        catch 
+        {
+            Print.ShowNoRegisteredPlayersMessage();
+            return;
+        }
     }
     #endregion
 }

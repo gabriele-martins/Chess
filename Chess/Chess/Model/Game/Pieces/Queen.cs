@@ -1,19 +1,22 @@
-﻿namespace Chess.Model.Game.Pieces;
+﻿using Chess.Model.Enum;
+
+namespace Chess.Model.Game.Pieces;
 
 public class Queen : Piece
 {
     #region Constructor
-    public Queen(int row, int column, string color) : base(row, column, color)
+    public Queen(int row, int column, Color color) : base(row, column)
     {
-        Symbol = "Q";
+        Color = color;
+        Symbol = Symbol.Q;
     }
     #endregion
 
     #region Methods
     public override bool IsPossibleMovement(int destinatedRow, int destinatedColumn, Board b)
     {
-        Bishop bishop = new Bishop(Row, Column, "Whatever");
-        Rook rook = new Rook(Row, Column, "Whatever");
+        Bishop bishop = new Bishop(Row, Column, Color.Colorless);
+        Rook rook = new Rook(Row, Column, Color.Colorless);
 
         if (bishop.IsPossibleMovement(destinatedRow, destinatedColumn, b) || rook.IsPossibleMovement(destinatedRow, destinatedColumn, b))
         {

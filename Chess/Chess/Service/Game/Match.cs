@@ -1,46 +1,57 @@
 ﻿using Chess.Controller.Players;
+using Chess.Model.Enum;
 using Chess.Model.Game;
 using Chess.Model.Game.Pieces;
 using Chess.Model.Players;
-using Chess.Service.Players;
 using Chess.View;
+using System.Numerics;
 
 namespace Chess.Service.Game;
 
 public class Match : Rules
 {
+    #region Attributes
+    private static Player _playerWhite;
+    private static Player _playerBlack;
+    private static Player _currentPlayer;
+    private static Player _winnerPlayer;
+    private static Board _board;
+    private static Piece _piece;
+    private static Piece _pieceTaken;
+    private static int _currentRow;
+    private static int _currentColumn;
+    private static int _destinatedRow;
+    private static int _destinatedColumn;
+    private static string _move;
+    private static bool _check;
+    private static bool _turn;
+    public static int round;
+    #endregion
+
     #region Methods
     public static void Play()
     {
-        Player playerWhite = GetPlayer("Brancas");
-        playerWhite.Color = "White";
-        Player playerBlack = GetPlayer("Pretas");
-        playerBlack.Color = "Black";
-        Player wildPlayer, winnerPlayer = new Player();
+        GetPlayers();
 
-        Board board = new Board();
+        _winnerPlayer = new Player();
 
-        Piece piece, ghostPiece;
+        _board = new Board();
 
-        int currentRow = 0, currentColumn = 0, destinatedRow = 0, destinatedColumn = 0;
+        round = 0;
 
-        int turn = 0;
+        _move = string.Empty;
 
-        int round = 0;
-
-        string move = "";
+        _check = true; 
+        _turn = true;
 
         do
         {
-            if (turn % 2 == 0)
-                wildPlayer = playerWhite;
-            else
-                wildPlayer = playerBlack;
+            ChangePlayer();
 
-            if (move == "empate")
+            if (_move == "empate")
             {
-                GetMove(wildPlayer, ref currentRow, ref currentColumn, ref move);
-                if(move == "sim")
+                GetMove();
+                if(_move == "sim")
                 {
                     BoardService.ShowChessboard();
                     Print.ShowTieMessage();
@@ -48,64 +59,62 @@ public class Match : Rules
                 }
                 else
                 {
-                    turn++;
+                    _turn = !_turn;
                     continue;
                 }
             }
 
-            if (IsInCheckOrCheckMate(wildPlayer, board) == "Check Mate")
+            if (KingIsInCheckMate(_currentPlayer.Color, _board))
             {
-                if (wildPlayer.Color == "White")
-                    winnerPlayer = playerBlack;
+                if (_currentPlayer.Color == Color.White)
+                    _winnerPlayer = _playerBlack;
                 else
-                    winnerPlayer = playerWhite;
+                    _winnerPlayer = _playerWhite;
 
                 BoardService.ShowChessboard();
-                Print.ShowCheckMateMessage(winnerPlayer);
+                Print.ShowCheckMateMessage(_winnerPlayer);
                 break;
             }
 
-            GetMove(wildPlayer, ref currentRow, ref currentColumn, ref move);
+            GetMove();
 
-            if (move == "empate")
+            if (_move == "empate")
             {
-                turn++;
+                _turn = !_turn;
                 continue;
             }
-            else if (move == "render")
+            else if (_move == "render")
             {
-                if (wildPlayer.Color == "White")
-                    winnerPlayer = playerBlack;
+                if (_currentPlayer.Color == Color.White)
+                    _winnerPlayer = _playerBlack;
                 else
-                    winnerPlayer = playerWhite;
+                    _winnerPlayer = _playerWhite;
 
                 BoardService.ShowChessboard();
-                Print.ShowSurrenderMessage(winnerPlayer);
+                Print.ShowSurrenderMessage(_winnerPlayer);
                 break;
             }
 
-            GetDestinatedPosition(wildPlayer, ref destinatedRow, ref destinatedColumn);
+            GetDestinatedPosition();
 
-            piece = Board.Table[currentRow, currentColumn];
-            ghostPiece = Board.Table[destinatedRow, destinatedColumn];
+            _piece = Board.BoardTable[_currentRow, _currentColumn];
 
-            if (piece.Symbol == "K")
+            if (_piece.Symbol == Symbol.K)
             {
-                if (WillBeInCheck(piece, board, destinatedRow, destinatedColumn))
+                if (KingWillBeInCheck(_currentPlayer.Color, _board, _destinatedRow, _destinatedColumn))
                 {
                     Print.ShowPuttingKingInCheckMessage();
                     continue;
                 }
             }
-
-            if (CheckValidMove(ref piece, destinatedRow, destinatedColumn, board))
+            else if (!KingIsInCheck(_currentPlayer.Color, _board))
             {
-                piece.Row = destinatedRow;
-                piece.Column = destinatedColumn;
-                piece.Moves++;
-                Board.Table[currentRow, currentColumn] = null;
-                Board.Table[destinatedRow, destinatedColumn] = piece;
-                turn++;
+                _check = false;
+            }
+            
+            if (CheckValidMove(ref _piece, _destinatedRow, _destinatedColumn, _board))
+            {
+                MovePiece();
             }
             else
             {
@@ -113,22 +122,20 @@ public class Match : Rules
                 continue;
             }
 
-            if (IsInCheckOrCheckMate(wildPlayer, board) == "Check")
+            if (KingIsInCheck(_currentPlayer.Color, _board))
             {
-                Print.ShowKingInCheckMessage();
-                piece.Row = currentRow;
-                piece.Column = currentColumn;
-                Board.Table[currentRow, currentColumn] = piece;
-                Board.Table[destinatedRow, destinatedColumn] = ghostPiece;
-                turn--;
+                UndoMovePiece();
                 continue;
             }
 
+            _check = true;
+
         } while (true);
 
-        UpdateScore(move, playerWhite, playerBlack, wildPlayer, winnerPlayer);
+        UpdateScore();
     }
-    private static Player GetPlayer(string cor)
+
+    private static Player AskForPlayer(string cor)
     {
         string playerNick;
         while (true)
@@ -148,87 +155,111 @@ public class Match : Rules
         }
     }
 
-    private static void GetMove(Player player, ref int currentRow, ref int currentColumn, ref string move)
+    private static void GetPlayers()
     {
-        string jogador;
+        do
+        {
+            _playerWhite = AskForPlayer("Brancas");
+            _playerWhite.Color = Color.White;
 
-        if (player.Color == "White")
-            jogador = $"{player.Nickname} (Peças Brancas)";
+            _playerBlack = AskForPlayer("Pretas");
+            _playerBlack.Color = Color.Black;
+
+            if (_playerWhite.Nickname == _playerBlack.Nickname)
+                Print.ShowCantPlayWithYourselfMessage();
+            else
+                break;
+        } while (true);
+    }
+
+    private static void ChangePlayer()
+    {
+        if (_turn)
+        {
+            _currentPlayer = _playerWhite;
+            round++;
+        }
         else
-            jogador = $"{player.Nickname} (Peças Pretas)";
+            _currentPlayer = _playerBlack;
+    }
+
+    private static void GetMove()
+    {
+        string playerNick = $"{_currentPlayer.Nickname} (Peças Pretas)";
+
+        if (_currentPlayer.Color == Color.White)
+            playerNick = $"{_currentPlayer.Nickname} (Peças Brancas)";
 
         while (true)
         {
             BoardService.ShowChessboard();
 
-            Console.WriteLine($"\n\n\tVez de {jogador}.");
+            Console.WriteLine($"\n\n\tVez de {playerNick}.");
 
-            if (move == "empate")
+            if (_move == "empate")
             {
                 Print.AskTie();
             }
 
             Console.Write("\n\tDigite sua jogada: ");
 
-            move = Console.ReadLine().ToLower();
+            _move = Console.ReadLine().ToLower();
 
-            if (string.IsNullOrEmpty(move))
+            if (string.IsNullOrEmpty(_move))
             {
                 Print.ShowNullValue();
                 continue;
             }
-            else if (move == "empate" || move == "render")
+            else if (_move == "empate" || _move == "render")
             {
                 break;
             }
-            else if (move == "sim" || move == "não")
+            else if (_move == "sim" || _move == "não")
             {
                 break;
             }
-            else if (move.Length != 2 || !char.IsLetter(move[0]) || !char.IsDigit(move[1]))
+            else if (_move.Length != 2 || !char.IsLetter(_move[0]) || !char.IsDigit(_move[1]))
             {
                 Print.ShowInvalidValue();
                 continue;
             }
-            else if (!Board.Rows.Contains(Convert.ToString(move[1])) || !Board.Columns.Contains(Convert.ToString(move[0])))
+            else if (!Board.Rows.Contains(Convert.ToString(_move[1])) || !Board.Columns.Contains(Convert.ToString(_move[0])))
             {
                 Print.ShowNonExistentPosition();
                 continue;
             }
-            else if (Board.Table[Array.IndexOf(Board.Rows, Convert.ToString(move[1])), Array.IndexOf(Board.Columns, Convert.ToString(move[0]))] == null)
+            else if (Board.BoardTable[Array.IndexOf(Board.Rows, Convert.ToString(_move[1])), Array.IndexOf(Board.Columns, Convert.ToString(_move[0]))].Symbol == Symbol.Empty)
             {
                 Print.ShowNoPieceHere();
                 continue;
             }
-            else if (Board.Table[Array.IndexOf(Board.Rows, Convert.ToString(move[1])), Array.IndexOf(Board.Columns, Convert.ToString(move[0]))].Color != player.Color)
+            else if (Board.BoardTable[Array.IndexOf(Board.Rows, Convert.ToString(_move[1])), Array.IndexOf(Board.Columns, Convert.ToString(_move[0]))].Color != _currentPlayer.Color)
             {
                 Print.ShowOpponetsPiece();
                 continue;
             }
             else
             {
-                currentRow = Array.IndexOf(Board.Rows, Convert.ToString(move[1]));
-                currentColumn = Array.IndexOf(Board.Columns, Convert.ToString(move[0]));
+                _currentRow = Array.IndexOf(Board.Rows, Convert.ToString(_move[1]));
+                _currentColumn = Array.IndexOf(Board.Columns, Convert.ToString(_move[0]));
                 break;
             }
         }
     }
 
-    private static void GetDestinatedPosition(Player player, ref int destinatedRow, ref int destinatedColumn)
+    private static void GetDestinatedPosition()
     {
         string destinatedPosition;
-        string jogador;
+        string playerNick = $"{_currentPlayer.Nickname} (Peças Pretas)";
 
-        if (player.Color == "White")
-            jogador = $"{player.Nickname} (Peças Brancas)";
-        else
-            jogador = $"{player.Nickname} (Peças Pretas)";
+        if (_currentPlayer.Color == Color.White)
+            playerNick = $"{_currentPlayer.Nickname} (Peças Brancas)";
 
         while (true)
         {
             BoardService.ShowChessboard();
 
-            Console.WriteLine($"\n\n\tVez do {jogador}.");
+            Console.WriteLine($"\n\n\tVez de {playerNick}.");
 
             Console.Write("\n\tDigite o destino: ");
 
@@ -251,44 +282,81 @@ public class Match : Rules
             }
             else
             {
-                destinatedRow = Array.IndexOf(Board.Rows, Convert.ToString(destinatedPosition[1]));
-                destinatedColumn = Array.IndexOf(Board.Columns, Convert.ToString(destinatedPosition[0]));
+                _destinatedRow = Array.IndexOf(Board.Rows, Convert.ToString(destinatedPosition[1]));
+                _destinatedColumn = Array.IndexOf(Board.Columns, Convert.ToString(destinatedPosition[0]));
                 break;
             }
         }
     }
 
-    private static void UpdateScore(string move, Player playerWhite, Player playerBlack, Player wildPlayer, Player winnerPlayer)
+    private static void MovePiece()
     {
-        if(move == "sim")
+        if (_piece.Symbol == Symbol.K && _piece.Color == Color.White)
         {
-            playerWhite.Matches++;
-            playerWhite.Ties++;
-            playerWhite.Score++;
-
-            playerBlack.Matches++;
-            playerBlack.Ties++;
-            playerBlack.Score++;
+            Board.WhiteKingsPosition[0] = _destinatedRow;
+            Board.WhiteKingsPosition[1] = _destinatedColumn;
         }
-        else if (move == "render")
+        else if (_piece.Symbol == Symbol.K)
         {
-            winnerPlayer.Matches++;
-            winnerPlayer.Wins++;
-            winnerPlayer.Score += 3;
+            Board.BlackKingsPosition[0] = _destinatedRow;
+            Board.BlackKingsPosition[1] = _destinatedColumn;
+        }
+        _piece.Row = _destinatedRow;
+        _piece.Column = _destinatedColumn;
+        _piece.Moves++;
+        Board.BoardTable[_currentRow, _currentColumn] = new Piece(_currentRow, _currentColumn);
+        _pieceTaken = Board.BoardTable[_destinatedRow, _destinatedColumn];
+        Board.BoardTable[_destinatedRow, _destinatedColumn] = _piece;
+        _turn = !_turn;
+    }
 
-            wildPlayer.Matches++;
-            wildPlayer.Defeats++;
+    private static void UndoMovePiece()
+    {
+        if (_check == false)
+        {
+            Print.ShowPuttingKingInCheckMessage();
+        }
+        else
+            Print.ShowKingInCheckMessage();
+        _piece.Row = _currentRow;
+        _piece.Column = _currentColumn;
+        _piece.Moves--;
+        Board.BoardTable[_currentRow, _currentColumn] = _piece;
+        Board.BoardTable[_destinatedRow, _destinatedColumn] = _pieceTaken;
+        _turn = !_turn;
+    }
+
+    private static void UpdateScore()
+    {
+        if(_move == "sim")
+        {
+            _playerWhite.Matches++;
+            _playerWhite.Ties++;
+            _playerWhite.Score++;
+
+            _playerBlack.Matches++;
+            _playerBlack.Ties++;
+            _playerBlack.Score++;
+        }
+        else if (_move == "render")
+        {
+            _winnerPlayer.Matches++;
+            _winnerPlayer.Wins++;
+            _winnerPlayer.Score += 3;
+
+            _currentPlayer.Matches++;
+            _currentPlayer.Defeats++;
         }
         else
         {
-            winnerPlayer.Matches++;
-            winnerPlayer.Wins++;
-            winnerPlayer.Score += 3;
+            _winnerPlayer.Matches++;
+            _winnerPlayer.Wins++;
+            _winnerPlayer.Score += 3;
 
-            wildPlayer.Matches++;
-            wildPlayer.Defeats++;
+            _currentPlayer.Matches++;
+            _currentPlayer.Defeats++;
         }
-        PlayerService.UpdatePlayers();
+        PlayerController.UpdatePlayers();
     }
     #endregion
 }

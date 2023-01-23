@@ -1,13 +1,16 @@
-﻿using Chess.Model.Game.Pieces;
+﻿using Chess.Model.Enum;
+using Chess.Model.Game.Pieces;
 
 namespace Chess.Model.Game;
 
 public class Board
 {
     #region Properties
-    public static Piece?[,] Table { get; set; }
+    public static Piece[,] BoardTable { get; set; }
     public static string[] Rows { get; set; }
     public static string[] Columns { get; set; }
+    public static int[] WhiteKingsPosition { get; set; }
+    public static int[] BlackKingsPosition { get; set; }
     #endregion
 
     #region Constructor
@@ -18,40 +21,50 @@ public class Board
         Columns = new string[8] { "a", "b", "c", "d", "e", "f", "g", "h" };
 
         //Creating the Board with a 2D array
-        Table = new Piece[8, 8];
+        BoardTable = new Piece[8, 8];
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                BoardTable[i, j] = new Piece(i, j);
+            }
+        }
 
         //Initial placement of Pawns on the Board
         for (int i = 0; i < 8; i++)
         {
-            Table[1, i] = new Pawn(1, i, "Black");
-            Table[6, i] = new Pawn(6, i, "White");
+            BoardTable[1, i] = new Pawn(1, i, Color.Black);
+            BoardTable[6, i] = new Pawn(6, i, Color.White);
         }
 
         //Initial placement of Rooks on the Board
-        Table[7, 0] = new Rook(7, 0, "White");
-        Table[7, 7] = new Rook(7, 0, "White");
-        Table[0, 0] = new Rook(0, 0, "Black");
-        Table[0, 7] = new Rook(0, 7, "Black");
+        BoardTable[7, 0] = new Rook(7, 0, Color.White);
+        BoardTable[7, 7] = new Rook(7, 0, Color.White);
+        BoardTable[0, 0] = new Rook(0, 0, Color.Black);
+        BoardTable[0, 7] = new Rook(0, 7, Color.Black);
 
         //Initial placement of Knights on the Board
-        Table[7, 1] = new Knight(7, 1, "White");
-        Table[7, 6] = new Knight(7, 6, "White");
-        Table[0, 1] = new Knight(0, 1, "Black");
-        Table[0, 6] = new Knight(0, 6, "Black");
+        BoardTable[7, 1] = new Knight(7, 1, Color.White);
+        BoardTable[7, 6] = new Knight(7, 6, Color.White);
+        BoardTable[0, 1] = new Knight(0, 1, Color.Black);
+        BoardTable[0, 6] = new Knight(0, 6, Color.Black);
 
         //Initial placement of Bishops on the Board
-        Table[7, 2] = new Bishop(7, 2, "White");
-        Table[7, 5] = new Bishop(7, 5, "White");
-        Table[0, 2] = new Bishop(0, 2, "Black");
-        Table[0, 5] = new Bishop(0, 5, "Black");
+        BoardTable[7, 2] = new Bishop(7, 2, Color.White);
+        BoardTable[7, 5] = new Bishop(7, 5, Color.White);
+        BoardTable[0, 2] = new Bishop(0, 2, Color.Black);
+        BoardTable[0, 5] = new Bishop(0, 5, Color.Black);
 
         //Initial placement of Queens on the Board
-        Table[7, 3] = new Queen(7, 3, "White");
-        Table[0, 3] = new Queen(0, 3, "Black");
+        BoardTable[7, 3] = new Queen(7, 3, Color.White);
+        BoardTable[0, 3] = new Queen(0, 3, Color.Black);
 
         //Initial placement of Kings on the Board
-        Table[7, 4] = new King(7, 4, "White");
-        Table[0, 4] = new King(0, 4, "Black");
+        BoardTable[7, 4] = new King(7, 4, Color.White);
+        WhiteKingsPosition = new int[2] { 7, 4 };
+        BoardTable[0, 4] = new King(0, 4, Color.Black);
+        BlackKingsPosition = new int[2] { 0, 4 };
+
     }
     #endregion
 }

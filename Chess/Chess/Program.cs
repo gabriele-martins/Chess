@@ -29,7 +29,7 @@ public class Program
                     PlayerService.ManipulatePlayerAccount();
                     break;
                 case "2":
-                    PlayerService.ShowPlayerRanking();
+                    PlayerService.ShowPlayersRanking();
                     break;
                 case "3":
                     Match.Play();

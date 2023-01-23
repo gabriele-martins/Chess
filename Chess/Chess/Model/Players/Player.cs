@@ -1,4 +1,5 @@
 ﻿using Chess.Controller.Players;
+using Chess.Model.Enum;
 
 namespace Chess.Model.Players;
 
@@ -46,7 +47,7 @@ public class Player
             }
         } 
     }
-    public string Color { get; set; }
+    public Color Color { get; set; }
     public int Matches { get; set; }
     public int Score { get; set; }
     public int Wins { get; set; }
@@ -57,7 +58,7 @@ public class Player
     #region Constructor
     public Player()
     {
-        Color = "";
+        Color = Color.Colorless;
         Matches = 0;
         Score = 0;
         Wins = 0;
