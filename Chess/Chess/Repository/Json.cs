@@ -7,20 +7,20 @@ namespace Chess.Repository;
 public class Json
 {
     #region Attributes
-    private static string path = @"C:..\..\..\Repository\PlayersData\Players.json";
+    private static string _path = @"C:..\..\..\Repository\PlayersData\Players.json";
     #endregion
 
     #region Methods
     private static void CriarJson()
     {
-        if (!File.Exists(path)) File.Create(path).Close();
+        if (!File.Exists(_path)) File.Create(_path).Close();
     }
 
     public static void Serializar(List<Player> players)
     {
         try
         {
-            using (StreamWriter sw = new StreamWriter(path))
+            using (StreamWriter sw = new StreamWriter(_path))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Serialize(sw, players);
@@ -38,7 +38,7 @@ public class Json
         List<Player> players = new List<Player>();
         try
         {
-            using (StreamReader sr = new StreamReader(path))
+            using (StreamReader sr = new StreamReader(_path))
             {
                 string jsonString = sr.ReadToEnd();
                 players = JsonConvert.DeserializeObject<List<Player>>(jsonString);

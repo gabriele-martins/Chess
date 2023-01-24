@@ -3,8 +3,8 @@ using Chess.Model.Enum;
 using Chess.Model.Game;
 using Chess.Model.Game.Pieces;
 using Chess.Model.Players;
+using Chess.Repository;
 using Chess.View;
-using System.Numerics;
 
 namespace Chess.Service.Game;
 
@@ -22,10 +22,17 @@ public class Match : Rules
     private static int _currentColumn;
     private static int _destinatedRow;
     private static int _destinatedColumn;
+    private static int _round;
+    private static string _destinatedPosition;
     private static string _move;
+    private static string _movesTextPgn;
+    private static string _textToRemove;
+    private static string _textPgn;
+    private static string _castling;
+    private static string _promotion;
+    private static bool _enPassant;
     private static bool _check;
     private static bool _turn;
-    public static int round;
     #endregion
 
     #region Methods
@@ -37,12 +44,17 @@ public class Match : Rules
 
         _board = new Board();
 
-        round = 0;
+        _round = 0;
 
         _move = string.Empty;
 
+        _movesTextPgn = string.Empty;
+
         _check = true; 
+
         _turn = true;
+
+        _textPgn = string.Empty;
 
         do
         {
@@ -55,11 +67,15 @@ public class Match : Rules
                 {
                     BoardService.ShowChessboard();
                     Print.ShowTieMessage();
+                    _movesTextPgn = "1/2-1/2";
+                    WriteMovesTextPgn(_movesTextPgn);
                     break;
                 }
                 else
                 {
                     _turn = !_turn;
+                    _round--;
+                    EraseMovesTextPgn("1/2-1/2");
                     continue;
                 }
             }
@@ -67,12 +83,21 @@ public class Match : Rules
             if (KingIsInCheckMate(_currentPlayer.Color, _board))
             {
                 if (_currentPlayer.Color == Color.White)
+                {
                     _winnerPlayer = _playerBlack;
+                    _textPgn = _textPgn.Trim();
+                    _movesTextPgn += "# 0-1";
+                }
                 else
+                {
                     _winnerPlayer = _playerWhite;
+                    _textPgn = _textPgn.Trim();
+                    _movesTextPgn += "# 1-0";
+                }
 
                 BoardService.ShowChessboard();
                 Print.ShowCheckMateMessage(_winnerPlayer);
+                WriteMovesTextPgn(_movesTextPgn);
                 break;
             }
 
@@ -86,12 +111,20 @@ public class Match : Rules
             else if (_move == "render")
             {
                 if (_currentPlayer.Color == Color.White)
+                {
                     _winnerPlayer = _playerBlack;
+                    _movesTextPgn += "0-1";
+
+                }
                 else
+                {
                     _winnerPlayer = _playerWhite;
+                    _movesTextPgn += "1-0";
+                }
 
                 BoardService.ShowChessboard();
                 Print.ShowSurrenderMessage(_winnerPlayer);
+                WriteMovesTextPgn(_movesTextPgn);
                 break;
             }
 
@@ -112,7 +145,7 @@ public class Match : Rules
                 _check = false;
             }
             
-            if (CheckValidMove(ref _piece, _destinatedRow, _destinatedColumn, _board))
+            if (CheckValidMove(ref _piece, _destinatedRow, _destinatedColumn, _board, ref _enPassant, ref _castling, ref _promotion))
             {
                 MovePiece();
             }
@@ -133,6 +166,12 @@ public class Match : Rules
         } while (true);
 
         UpdateScore();
+        if (_movesTextPgn.Contains("1-0"))
+            Pgn.CreatePgnFile(_playerWhite.Nickname, _playerBlack.Nickname, "1-0",_textPgn);
+        else if (_movesTextPgn.Contains("0-1"))
+            Pgn.CreatePgnFile(_playerWhite.Nickname, _playerBlack.Nickname, "0-1", _textPgn);
+        else
+            Pgn.CreatePgnFile(_playerWhite.Nickname, _playerBlack.Nickname, "1/2-1/2", _textPgn);
     }
 
     private static Player AskForPlayer(string cor)
@@ -177,7 +216,7 @@ public class Match : Rules
         if (_turn)
         {
             _currentPlayer = _playerWhite;
-            round++;
+            _round++;
         }
         else
             _currentPlayer = _playerBlack;
@@ -249,7 +288,6 @@ public class Match : Rules
 
     private static void GetDestinatedPosition()
     {
-        string destinatedPosition;
         string playerNick = $"{_currentPlayer.Nickname} (Peças Pretas)";
 
         if (_currentPlayer.Color == Color.White)
@@ -263,27 +301,27 @@ public class Match : Rules
 
             Console.Write("\n\tDigite o destino: ");
 
-            destinatedPosition = Console.ReadLine().ToLower();
+            _destinatedPosition = Console.ReadLine().ToLower();
 
-            if (string.IsNullOrEmpty(destinatedPosition))
+            if (string.IsNullOrEmpty(_destinatedPosition))
             {
                 Print.ShowNullValue();
                 continue;
             }
-            else if (destinatedPosition.Length != 2 || !char.IsDigit(destinatedPosition[1]) || !char.IsLetter(destinatedPosition[0]) || destinatedPosition.Length != 2)
+            else if (_destinatedPosition.Length != 2 || !char.IsDigit(_destinatedPosition[1]) || !char.IsLetter(_destinatedPosition[0]) || _destinatedPosition.Length != 2)
             {
                 Print.ShowInvalidValue();
                 continue;
             }
-            else if (!Board.Rows.Contains(Convert.ToString(destinatedPosition[1])) || !Board.Columns.Contains(Convert.ToString(destinatedPosition[0])))
+            else if (!Board.Rows.Contains(Convert.ToString(_destinatedPosition[1])) || !Board.Columns.Contains(Convert.ToString(_destinatedPosition[0])))
             {
                 Print.ShowNonExistentPosition();
                 continue;
             }
             else
             {
-                _destinatedRow = Array.IndexOf(Board.Rows, Convert.ToString(destinatedPosition[1]));
-                _destinatedColumn = Array.IndexOf(Board.Columns, Convert.ToString(destinatedPosition[0]));
+                _destinatedRow = Array.IndexOf(Board.Rows, Convert.ToString(_destinatedPosition[1]));
+                _destinatedColumn = Array.IndexOf(Board.Columns, Convert.ToString(_destinatedPosition[0]));
                 break;
             }
         }
@@ -301,11 +339,35 @@ public class Match : Rules
             Board.BlackKingsPosition[0] = _destinatedRow;
             Board.BlackKingsPosition[1] = _destinatedColumn;
         }
+
+        _pieceTaken = Board.BoardTable[_destinatedRow, _destinatedColumn];
+
+        if (_piece.Color == Color.White)
+        {
+            _movesTextPgn = _round.ToString() + ". ";
+        }
+        
+        WriteMovesPiecePgn();
+        WriteMovesTextPgn(_movesTextPgn);
+        _textToRemove = _movesTextPgn;
+        _movesTextPgn = string.Empty;
+
         _piece.Row = _destinatedRow;
         _piece.Column = _destinatedColumn;
         _piece.Moves++;
+
+        if (_piece.Color == Color.White)
+        {
+            if (_piece.IsPossibleMovement(Board.BlackKingsPosition[0], Board.BlackKingsPosition[1], _board))
+                _textPgn = _textPgn.Trim() + "+ ";
+        }
+        else
+        {
+            if (_piece.IsPossibleMovement(Board.WhiteKingsPosition[0], Board.WhiteKingsPosition[1], _board))
+                _textPgn = _textPgn.Trim() + "+ ";
+        }
+
         Board.BoardTable[_currentRow, _currentColumn] = new Piece(_currentRow, _currentColumn);
-        _pieceTaken = Board.BoardTable[_destinatedRow, _destinatedColumn];
         Board.BoardTable[_destinatedRow, _destinatedColumn] = _piece;
         _turn = !_turn;
     }
@@ -318,6 +380,10 @@ public class Match : Rules
         }
         else
             Print.ShowKingInCheckMessage();
+
+        EraseMovesTextPgn(_textToRemove);
+        _textToRemove = string.Empty;
+
         _piece.Row = _currentRow;
         _piece.Column = _currentColumn;
         _piece.Moves--;
@@ -357,6 +423,72 @@ public class Match : Rules
             _currentPlayer.Defeats++;
         }
         PlayerController.UpdatePlayers();
+    }
+
+    private static void WriteMovesTextPgn(string text)
+    {
+        _textPgn += text;
+    }
+
+    private static void EraseMovesTextPgn(string text)
+    {
+        _textPgn = _textPgn.Replace(text,"");
+    }
+
+    private static void WriteMovesPiecePgn()
+    {
+        if (_promotion != string.Empty)
+        {
+            _movesTextPgn += _destinatedPosition + "=" + _promotion + " ";
+            return;
+        }
+
+        switch (_piece.Symbol)
+        {
+            case Symbol.K:
+                if (_pieceTaken.Symbol == Symbol.Empty)
+                {
+                    if (_castling == "Minor")
+                        _movesTextPgn += "O-O ";
+                    else if (_castling == "Major")
+                        _movesTextPgn += "O-O-O ";
+                    else
+                        _movesTextPgn += "K" + _destinatedPosition + " ";
+                }
+                else
+                    _movesTextPgn += "Kx" + _destinatedPosition + " ";
+                    break;
+            case Symbol.Q:
+                if (_pieceTaken.Symbol == Symbol.Empty)
+                    _movesTextPgn += "Q" + _destinatedPosition + " ";
+                else
+                    _movesTextPgn += "Qx" + _destinatedPosition + " ";
+                break;
+            case Symbol.R:
+                if (_pieceTaken.Symbol == Symbol.Empty)
+                    _movesTextPgn += "R" + _destinatedPosition + " ";
+                else
+                    _movesTextPgn += "Rx" + _destinatedPosition + " ";
+                break;
+            case Symbol.B:
+                if (_pieceTaken.Symbol == Symbol.Empty)
+                    _movesTextPgn += "B" + _destinatedPosition + " ";
+                else
+                    _movesTextPgn += "Bx" + _destinatedPosition + " ";
+                break;
+            case Symbol.N:
+                if (_pieceTaken.Symbol == Symbol.Empty)
+                    _movesTextPgn += "N" + _destinatedPosition + " ";
+                else
+                    _movesTextPgn += "Nx" + _destinatedPosition + " ";
+                break;
+            case Symbol.P:
+                if (_enPassant || _pieceTaken.Symbol != Symbol.Empty)
+                    _movesTextPgn += Board.Columns[_piece.Column] + "x" + _destinatedPosition + " ";
+                else
+                    _movesTextPgn += _destinatedPosition + " ";
+                break;
+        }
     }
     #endregion
 }

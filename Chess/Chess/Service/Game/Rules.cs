@@ -8,13 +8,18 @@ namespace Chess.Service.Game;
 public class Rules
 {
     #region Methods
-    protected static bool CheckValidMove(ref Piece piece, int destinatedRow, int destinatedColumn, Board b)
+    protected static bool CheckValidMove(ref Piece piece, int destinatedRow, int destinatedColumn, Board b, ref bool enPassant, ref string castling, ref string promotion)
     {
+        enPassant = false;
+        castling = string.Empty;
+        promotion = string.Empty;
+
         if (piece.Symbol == Symbol.P && CheckEnPassant(piece, destinatedRow, destinatedColumn))
         {
+            enPassant = true;
             return true;
         }
-        else if (piece.Symbol == Symbol.K && CheckCastling(piece, destinatedRow, destinatedColumn, b))
+        else if (piece.Symbol == Symbol.K && CheckCastling(piece, destinatedRow, destinatedColumn, b, ref castling))
         {
             return true;
         }
@@ -24,6 +29,7 @@ public class Rules
             if (piece.Symbol == Symbol.P && (destinatedRow == 0 || destinatedRow == 7))
             {
                 piece = CheckPawnPromotion(piece, destinatedRow, destinatedColumn);
+                promotion = piece.Symbol.ToString();
             }
             return true;
         }
@@ -94,7 +100,7 @@ public class Rules
         return false;
     }
 
-    protected static bool CheckCastling(Piece piece, int destinatedRow, int destinatedColumn, Board b)
+    protected static bool CheckCastling(Piece piece, int destinatedRow, int destinatedColumn, Board b, ref string castling)
     {
         if (destinatedRow == piece.Row && destinatedColumn != piece.Column)
         {
@@ -114,6 +120,7 @@ public class Rules
                         Board.BoardTable[destinatedRow, 5].Row = destinatedRow;
                         Board.BoardTable[destinatedRow, 5].Column = 5;
                         Board.BoardTable[destinatedRow, 5].Moves++;
+                        castling = "Minor";
 
                         return true;
                     }
@@ -127,6 +134,7 @@ public class Rules
                         Board.BoardTable[destinatedRow, 3].Row = destinatedRow;
                         Board.BoardTable[destinatedRow, 3].Column = 3;
                         Board.BoardTable[destinatedRow, 3].Moves++;
+                        castling = "Major";
 
                         return true;
                     }
@@ -136,42 +144,104 @@ public class Rules
         return false;
     }
 
-    //protected static void CheckIfPieceProtectsKing(Color color, Board b, int row, int column)
-    //{
-    //    for (int i = 0; i < 8; i++)
-    //    {
-    //        for (int j = 0; j < 8; j++)
-    //        {
-    //            if (Board.BoardTable[i, j].Symbol != Symbol.Empty && Board.BoardTable[i, j].Symbol != Symbol.N && Board.BoardTable[i, j].Color != color && Board.BoardTable[i, j].IsPossibleMovement(row, column, b))
-    //            {
-    //                Piece adversaryPiece = Board.BoardTable[i, j];
-    //                if (adversaryPiece.Row<row && adversaryPiece.Column < column)
-    //                {
-    //                    for (int r = 0; r < 8; r++)
-    //                    {
-    //                        for (int c = 0; c < 8; c++)
-    //                        {
-    //                            if (Board.BoardTable[i, j].Symbol != Symbol.Empty && Board.BoardTable[i, j].Color == color && Board.BoardTable[i, j].IsPossibleMovement(row, column, b))
-    //                            {
+    protected static bool CheckIfPiecesProtectsKing(Color color, Board b, int row, int column)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (Board.BoardTable[i, j].Symbol != Symbol.Empty && Board.BoardTable[i, j].Symbol != Symbol.N && Board.BoardTable[i, j].Color != color && Board.BoardTable[i, j].IsPossibleMovement(row, column, b))
+                {
+                    List<int[]> positions = new List<int[]>();
+                    int incrementRow = Convert.ToInt32(Math.Abs(row - i));
+                    int incrementColumn = Convert.ToInt32(Math.Abs(column - j));
 
-    //                            }
-    //                        }
-    //                    }
-    //                }
-    //                //for (int r = 0; r < 8; r++)
-    //                //{
-    //                //    for (int c = 0; c < 8; c++)
-    //                //    {
-    //                //        if (Board.BoardTable[i, j].Symbol != Symbol.Empty && Board.BoardTable[i, j].Color == color && Board.BoardTable[i, j].IsPossibleMovement(row, column, b))
-    //                //        {
+                    if (incrementRow == 0 && incrementColumn != 0)
+                    {
+                        if (column > j)
+                        {
+                            for (int c = j; c < j + incrementColumn; c++)
+                                positions.Add(new int[] { i, c });
+                        }
+                        else
+                        {
+                            for (int c = j; c > j - incrementColumn; c--)
+                                positions.Add(new int[] { i, c });
+                        }
+                    }
+                    else if (incrementRow != 0 && incrementColumn == 0)
+                    {
+                        if (row > i)
+                        {
+                            for (int r = i; r < i + incrementRow; r++)
+                                positions.Add(new int[] { r, j });
+                        }
+                        else
+                        {
+                            for (int r = i; r > i - incrementRow; r--)
+                                positions.Add(new int[] { r, j });
+                        }
+                    }
+                    else
+                    {
+                        if (row > i && column > j)
+                        {
+                            for (int r = i, c = j; r < row; r++, c++)
+                            {
+                                positions.Add(new int[] { r, c });
+                            }
+                        }
+                        else if (row > i && column < j)
+                        {
+                            for (int r = i, c = j; r < row; r++, c--)
+                            {
+                                positions.Add(new int[] { r, c });
+                            }
+                        }
+                        else if (row < i && column > j)
+                        {
+                            for (int r = i, c = j; r > row; r--, c++)
+                            {
+                                positions.Add(new int[] { r, c });
+                            }
+                        }
+                        else
+                        {
+                            for (int r = i, c = j; r > row; r--, c--)
+                            {
+                                positions.Add(new int[] { r, c });
+                            }
+                        }
+                    }
 
-    //                //        }
-    //                //    }
-    //                //}
-    //            }
-    //        }
-    //    }
-    //}
+                    if (CheckIfPiecesGetInTheWay(positions, color, b))
+                        return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    protected static bool CheckIfPiecesGetInTheWay(List<int[]> positions, Color color, Board b)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (Board.BoardTable[i, j].Symbol != Symbol.Empty && Board.BoardTable[i, j].Color == color)
+                {
+                    for (int k = 0; k < positions.Count; k++)
+                    {
+                        if (Board.BoardTable[i, j].IsPossibleMovement(positions[k][0], positions[k][1], b))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
     protected static bool KingIsInCheck(Color color, Board b)
     {
@@ -241,18 +311,11 @@ public class Rules
                     if (KingWillBeInCheck(color, b, kingsSurroudings[k, 0], kingsSurroudings[k, 1]))
                         possibleCaptures++;
                 }
-                else
-                {
-                    kingsSurroudings[k, 0] = -2;
-                    kingsSurroudings[k, 1] = -2;
-                }
-            }
-            else
-            {
-                kingsSurroudings[k,0] = -2;
-                kingsSurroudings[k,1] = -2;
             }
         }
+
+        if (possibleCaptures == 1 && CheckIfPiecesProtectsKing(color, b, kingRow, kingColumn))
+            return false;
 
         if (check && possiblePositions == possibleCaptures) return true;
         else return false;

@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Repository\MatchData\" />
     <Folder Include="Repository\PlayersData\" />
   </ItemGroup>
 
