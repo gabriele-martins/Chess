@@ -31,12 +31,12 @@ public class PlayerController
 
     public static string GetNickname()
     {
-        string nick;
+        Player player = new Player();
         while (true)
         {
             try
             {
-                nick = Print.AskNickname();
+                player.Nickname = Print.AskNickname();
                 break;
             }
             catch (Exception e)
@@ -45,17 +45,17 @@ public class PlayerController
                 Print.ShowTryAgainMessage();
             }
         }
-        return nick;
+        return player.Nickname;
     }
 
     public static string GetPass()
     {
-        string pass;
+        Player player = new Player();
         while (true)
         {
             try
             {
-                pass = Print.AskPass();
+                player.Pass = Print.AskPass();
                 break;
             }
             catch (Exception e)
@@ -64,7 +64,7 @@ public class PlayerController
                 Print.ShowTryAgainMessage();
             }
         }
-        return pass;
+        return player.Pass;
     }
 
     public static void AddPlayer()
