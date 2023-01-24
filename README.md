@@ -4,20 +4,20 @@
 
 <h4 align="center">  🚧 Chess 🚀 Em construção... 🚧 </h4>
 
-# Sumário :bookmark_tabs:
+# Sumário 
 
-* [Descrição](#Descrição-)
-* [Features](#Features-)   
-* [Demonstração](#Demonstração-)
-* [Instalação](#Instalação-)
-* [Tecnologias Utilizadas](#Tecnologias-Utilizadas-)
-* [Autor](#Autor-)
+* [Descrição](#Descrição)
+* [Features](#Features)   
+* [Demonstração](#Demonstração)
+* [Instalação](#Instalação)
+* [Tecnologias Utilizadas](#Tecnologias-Utilizadas)
+* [Autor](#Autor)
 
-# Descrição :book:
+# Descrição 
 
 Esse projeto foi desenvolvido como atividade para ser entregue no programa Sharp Coders da Ímã Learning Place e consiste em uma aplicação console de um Jogo de Xadrez com persistência dos jogadores cadastrados e seus dados (JSON) e também o registro das partidas (PGN). 
 
-# Features :rocket:
+# Features 
 
 - [x] Cadastra novos jogadores que possuem nickname e senha
 - [x] Salva os jogadores cadastrados em um arquivo JSON
@@ -28,13 +28,13 @@ Esse projeto foi desenvolvido como atividade para ser entregue no programa Sharp
 - [x] Permite que dois jogadores cadastrados joguem xadrez
 - [x] Gera um arquivo PGN e salva o histórico da partida nele
 
-# Demonstração :next_track_button:
+# Demonstração 
 
 <h1 align="center">  
     <video src="https://user-images.githubusercontent.com/116194748/214375474-c35eb2af-b425-4ec5-a06c-78f42eb11b54.mp4"></video>
 </h1>
 
-# Instalação :heavy_check_mark:
+# Instalação 
 
 Para acessar o jogo basta **clonar** o repositório e rodar o arquivo **Chess.exe**:
 
@@ -48,7 +48,7 @@ git clone https://github.com/gabriele-martins/Chess.git
 
 Chess\Chess\bin\Debug\net6.0\Chess.exe
 
-# Tecnologias Utilizadas :gear:
+# Tecnologias Utilizadas 
 
 - Linguagem C#
 - IDE Visual Studio
@@ -56,7 +56,7 @@ Chess\Chess\bin\Debug\net6.0\Chess.exe
 - JSON (Javascript Object Notation)
 - PGN (Portable Game Notation)
 
-# Autor :woman_technologist:
+# Autor 
 
 <h1 align="left">  
     <img alt="ProfilePicture" title="#ProfilePicture" width=180px src="https://avatars.githubusercontent.com/u/116194748?s=400&u=cba011cc512094051366a94ef260ded447b35ccf&v=4" /> 
